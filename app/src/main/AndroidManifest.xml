@@ -38,6 +38,15 @@
             </intent-filter>
         </receiver>
 
+        <!-- ✅ 잠금 해제 감지 수신자 -->
+        <receiver
+            android:name=".receiver.LockStatusReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
