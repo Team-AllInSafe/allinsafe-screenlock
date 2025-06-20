@@ -1,14 +1,19 @@
 package com.example.allinsafe_screenlock.util
 
+import android.content.Context
 import android.util.Log
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 object LockLogManager {
-    fun logLockEvent(reason: String) {
-        val timestamp = System.currentTimeMillis()
-        val formattedTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date(timestamp))
-        Log.d("🔐 LockEvent", "잠금 발생 - 사유: $reason, 시각: $formattedTime")
+
+    fun log(context: Context, reason: String) {
+        val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+        val logEntry = "$timestamp - 잠금 사유: $reason"
+        Log.d("LockLog", logEntry)
+
+        // 향후 Firebase 업로드 또는 파일 저장을 위한 포맷
+        // 예: 저장 예정 => context.filesDir.resolve("lock_logs.txt").appendText(logEntry + "\n")
     }
-    // 여기서 firebase에 업로드 시킬 예정
 }

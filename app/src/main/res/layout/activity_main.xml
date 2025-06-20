@@ -13,9 +13,9 @@
         android:text="관리자 권한 요청" />
 
     <Button
-        android:id="@+id/btn_lock"
+        android:id="@+id/btn_lock_now"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="기기 잠금"
+        android:text="지금 잠금"
         android:layout_marginTop="16dp" />
 </LinearLayout>
