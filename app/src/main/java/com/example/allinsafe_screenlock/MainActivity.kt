@@ -21,6 +21,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // ✅ [테스트용] 부팅 시간 강제 세팅 (7시간 전)
+        // 테스트가 끝나면 반드시 삭제하자 !!!
+        com.example.allinsafe_screenlock.util.BootTimeManager.saveLastBootTime(
+            this,
+            System.currentTimeMillis() - (7 * 60 * 60 * 1000L)
+        )
+
         dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
         compName = ComponentName(this, MyDeviceAdminReceiver::class.java)
 
