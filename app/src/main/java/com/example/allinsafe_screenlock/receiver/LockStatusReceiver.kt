@@ -3,23 +3,28 @@ package com.example.allinsafe_screenlock.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.example.allinsafe_screenlock.util.LockReasonManager
-import com.example.allinsafe_screenlock.util.TwoFactorAuthManager
+import android.util.Log
+import com.example.allinsafe_screenlock.pinlock.PinLockActivity
 import com.example.allinsafe_screenlock.pinlock.PinStorageManager
-
-
-// 브로드캐스트를 통한 화면켜짐 감지
+import com.example.allinsafe_screenlock.util.TwoFactorAuthManager
+import com.example.allinsafe_screenlock.util.LockReasonManager
 
 class LockStatusReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Intent.ACTION_USER_PRESENT) {
-            // ✅ 화면잠금 기능 + 2차 인증 + PIN 설정 시 → 인증 필요 기록
-            if (TwoFactorAuthManager.isScreenLockEnabled(context) &&
-                TwoFactorAuthManager.is2FAEnabled(context) &&
-                PinStorageManager.isPinSet(context)) {
+            val is2FA = TwoFactorAuthManager.is2FAEnabled(context)
+            val hasPin = PinStorageManager.isPinSet(context)
+            val hasReason = LockReasonManager.hasReason(context)
 
-                // ✅ 잠금 사유 기록 (MainActivity에서 인증화면 실행을 유도)
-                LockReasonManager.saveReason(context, "화면이 꺼졌다가 켜짐")
+            Log.d("PinFlowCheck", "📡 브로드캐스트 수신 → 2FA: $is2FA, PinSet: $hasPin, HasReason: $hasReason")
+
+            if (is2FA && hasPin && hasReason) {
+                val pinIntent = Intent(context, PinLockActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                context.startActivity(pinIntent)
+            } else {
+                Log.d("PinFlowCheck", "🔕 조건 불충족 → 인증 화면 띄우지 않음")
             }
         }
     }

@@ -13,6 +13,7 @@ import com.example.allinsafe_screenlock.pinlock.PinSetupActivity
 import com.example.allinsafe_screenlock.pinlock.PinStorageManager
 import com.example.allinsafe_screenlock.util.LockReasonManager
 import com.example.allinsafe_screenlock.util.TwoFactorAuthManager
+import android.util.Log
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,8 +33,16 @@ class MainActivity : AppCompatActivity() {
         val btnSetPin = findViewById<Button>(R.id.btn_set_pin)
 
         // 🔹 초기 스위치 & 버튼 상태
+        val initialScreenLockEnabled = TwoFactorAuthManager.isScreenLockEnabled(this)
+        val initial2FAEnabled = TwoFactorAuthManager.is2FAEnabled(this)
+
+        Log.d("PinFlowCheck", "초기 상태 → ScreenLock: $initialScreenLockEnabled, 2FA: $initial2FAEnabled")
+
+        // 🔹 초기 스위치 & 버튼 상태
         switch2FA.isChecked = TwoFactorAuthManager.isScreenLockEnabled(this)
+        TwoFactorAuthManager.set2FAEnabled(this, switch2FA.isChecked)  // ✅ 이 줄 추가!!
         btnSetPin.visibility = if (switch2FA.isChecked) View.VISIBLE else View.GONE
+
 
         // 🔹 관리자 권한 요청
         btnRequestAdmin.setOnClickListener {
@@ -46,15 +55,22 @@ class MainActivity : AppCompatActivity() {
         // 🔹 수동 잠금
         btnLockNow.setOnClickListener {
             if (dpm.isAdminActive(compName)) {
+                // 🔐 잠금 사유 저장
+                LockReasonManager.saveReason(this, "수동 잠금")
+
+                // 📱 실제 잠금 수행
                 dpm.lockNow()
             } else {
                 Toast.makeText(this, "관리자 권한이 필요합니다", Toast.LENGTH_SHORT).show()
             }
         }
 
+
         // 🔹 2차 인증 사용 여부 토글
         switch2FA.setOnCheckedChangeListener { _, isChecked ->
+            Log.d("PinFlowCheck", "스위치 클릭됨 → isChecked: $isChecked")
             TwoFactorAuthManager.setScreenLockEnabled(this, isChecked)
+            TwoFactorAuthManager.set2FAEnabled(this, isChecked)
             btnSetPin.visibility = if (isChecked) View.VISIBLE else View.GONE
         }
 
@@ -67,15 +83,20 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        // ✅ 시스템 잠금 해제 이후 MainActivity에 진입한 경우 → PIN 인증 실행
-        if (TwoFactorAuthManager.isScreenLockEnabled(this) &&
-            PinStorageManager.isPinSet(this) &&
-            LockReasonManager.hasReason(this)) {
+        val is2FA = TwoFactorAuthManager.is2FAEnabled(this)
+        val hasPin = PinStorageManager.isPinSet(this)
+        val hasReason = LockReasonManager.hasReason(this)
 
+        Log.d("PinFlowCheck", "onResume 상태 → 2FA: $is2FA, PinSet: $hasPin, HasReason: $hasReason")
+
+        if (is2FA && hasPin && hasReason) {
+            Log.d("PinFlowCheck", "🔐 조건 만족 → 인증 화면 실행")
             val intent = Intent(this, PinLockActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
             startActivity(intent)
+        } else {
+            Log.d("PinFlowCheck", "❌ 조건 불충족 → 인증 화면 안뜸")
         }
     }
 }

@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.allinsafe_screenlock.R
 
+
 class PinSetupActivity : AppCompatActivity() {
 
     private lateinit var etPin: EditText
