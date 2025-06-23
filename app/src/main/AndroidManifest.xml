@@ -5,7 +5,7 @@
     <!-- ✅ 네트워크 상태 체크 권한 -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!-- BOOT 권한 추가 -->
+    <!-- ✅ BOOT 권한 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
@@ -29,11 +29,25 @@
             </intent-filter>
         </activity>
 
-        <!-- ✅ Device Admin 권한 수신자 -->
+        <!-- ✅ PIN 설정 액티비티 -->
+        <activity
+            android:name=".pinlock.PinSetupActivity"
+            android:exported="false"
+            android:label="PIN 설정"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+        <!-- ✅ PIN 입력 액티비티 -->
+        <activity
+            android:name=".pinlock.PinLockActivity"
+            android:exported="false"
+            android:label="PIN 인증"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
+        <!-- ✅ Device Admin 수신자 -->
         <receiver
             android:name=".MyDeviceAdminReceiver"
             android:permission="android.permission.BIND_DEVICE_ADMIN"
-            android:exported="true">
+            android:exported="false">
             <meta-data
                 android:name="android.app.device_admin"
                 android:resource="@xml/device_admin_receiver" />
@@ -42,6 +56,7 @@
             </intent-filter>
         </receiver>
 
+        <!-- ✅ 부팅 감지 리시버 -->
         <receiver
             android:name=".receiver.BootReceiver"
             android:enabled="true"
@@ -50,6 +65,18 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <!-- ✅ 잠금 해제 감지 리시버 -->
+        <receiver
+            android:name=".receiver.LockStatusReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+        </receiver>
+
+
 
 
     </application>

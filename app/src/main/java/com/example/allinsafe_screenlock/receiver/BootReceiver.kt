@@ -12,16 +12,17 @@ import com.example.allinsafe_screenlock.util.LockReasonManager
 class BootReceiver : BroadcastReceiver() {
 
     companion object {
-        private const val THRESHOLD_MILLIS = 6 * 60 * 60 * 1000L  // 6시간
+        //private const val THRESHOLD_MILLIS = 6 * 60 * 60 * 1000L  // 6시간
+        private const val THRESHOLD_MILLIS = 1 * 1000L              // 1초
     }
 
     override fun onReceive(context: Context, intent: Intent?) {
         if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
-            val now = System.currentTimeMillis()text)
+            val now = System.currentTimeMillis()
+            val lastBootTime = BootTimeManager.getLastBootTime(context)
 
-            val lastBootTime = BootTimeManager.getLastBootTime(con
             if (lastBootTime != 0L && (now - lastBootTime) >= THRESHOLD_MILLIS) {
-                val reason = "장시간 꺼짐 감지"
+                val reason = "2차 인증 요청"
                 LockReasonManager.saveReason(context, reason)
                 LockLogManager.log(context, reason)
                 LockManager.lockNow(context)

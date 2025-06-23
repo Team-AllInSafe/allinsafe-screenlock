@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">AllinSafe_Screenlock</string>
+    <string name="app_name">All-In-Safe</string>
+    <string name="request_admin">관리자 권한 요청</string>
+    <string name="lock_now">수동 잠금</string>
+    <string name="use_2fa">2차 인증 사용</string>
+    <string name="set_or_change_pin">PIN 설정 / 변경</string>
 </resources>

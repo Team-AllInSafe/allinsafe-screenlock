@@ -25,4 +25,10 @@ object LockReasonManager {
             context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         prefs.edit().remove(KEY_REASON).apply()
     }
+
+    fun hasReason(context: Context): Boolean {
+        val prefs: SharedPreferences =
+            context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        return prefs.contains(KEY_REASON)
+    }
 }
