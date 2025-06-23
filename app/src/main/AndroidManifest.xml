@@ -56,16 +56,6 @@
             </intent-filter>
         </receiver>
 
-        <!-- ✅ 부팅 감지 리시버 -->
-        <receiver
-            android:name=".receiver.BootReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-
         <!-- ✅ 잠금 해제 감지 리시버 -->
         <receiver
             android:name=".receiver.LockStatusReceiver"
@@ -75,9 +65,6 @@
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
-
-
-
 
     </application>
 
