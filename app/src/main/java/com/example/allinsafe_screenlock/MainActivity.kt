@@ -10,6 +10,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.allinsafe_screenlock.pinlock.PinLockActivity
 import com.example.allinsafe_screenlock.pinlock.PinSetupActivity
+import com.example.allinsafe_screenlock.pinlock.PinStorageManager
 import com.example.allinsafe_screenlock.util.LockReasonManager
 import com.example.allinsafe_screenlock.util.TwoFactorAuthManager
 
@@ -20,15 +21,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // ✅ 2차 인증이 켜져 있고, 인증이 필요한 경우 PIN 인증화면으로 전환
-        if (TwoFactorAuthManager.is2FAEnabled(this) &&
-            LockReasonManager.hasReason(this)) {
-            startActivity(Intent(this, PinLockActivity::class.java))
-            finish()
-            return
-        }
-
         setContentView(R.layout.activity_main)
 
         dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
@@ -40,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         val btnSetPin = findViewById<Button>(R.id.btn_set_pin)
 
         // 🔹 초기 스위치 & 버튼 상태
-        switch2FA.isChecked = TwoFactorAuthManager.is2FAEnabled(this)
+        switch2FA.isChecked = TwoFactorAuthManager.isScreenLockEnabled(this)
         btnSetPin.visibility = if (switch2FA.isChecked) View.VISIBLE else View.GONE
 
         // 🔹 관리자 권한 요청
@@ -62,13 +54,28 @@ class MainActivity : AppCompatActivity() {
 
         // 🔹 2차 인증 사용 여부 토글
         switch2FA.setOnCheckedChangeListener { _, isChecked ->
-            TwoFactorAuthManager.set2FAEnabled(this, isChecked)
+            TwoFactorAuthManager.setScreenLockEnabled(this, isChecked)
             btnSetPin.visibility = if (isChecked) View.VISIBLE else View.GONE
         }
 
         // 🔹 PIN 설정 화면 이동
         btnSetPin.setOnClickListener {
             startActivity(Intent(this, PinSetupActivity::class.java))
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // ✅ 시스템 잠금 해제 이후 MainActivity에 진입한 경우 → PIN 인증 실행
+        if (TwoFactorAuthManager.isScreenLockEnabled(this) &&
+            PinStorageManager.isPinSet(this) &&
+            LockReasonManager.hasReason(this)) {
+
+            val intent = Intent(this, PinLockActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+            startActivity(intent)
         }
     }
 }

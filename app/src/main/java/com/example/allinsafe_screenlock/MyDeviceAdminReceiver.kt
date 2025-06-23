@@ -1,3 +1,6 @@
+//조건2:잠금 해제 실패 횟수 확인을 기능을 위한 리시버.
+//받아오는 관리자 권한 역시 횟수 확인을 위한 것이다.
+
 package com.example.allinsafe_screenlock
 
 import android.app.admin.DeviceAdminReceiver
